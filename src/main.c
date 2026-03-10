@@ -6,7 +6,7 @@ int main(int argc, char *argv[]) {
   // Flush after every printf
   setbuf(stdout, NULL);
 
-  write(1, "$ ", 1);
+  write(1, "$ ", 2);
 
   return 0;
 }
