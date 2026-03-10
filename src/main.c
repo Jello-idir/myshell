@@ -1,12 +1,12 @@
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
 
 int main(int argc, char *argv[]) {
-  // Flush after every printf
-  setbuf(stdout, NULL);
+  char command[1024];
 
-  write(1, "$ ", 2);
+  setbuf(stdout, NULL);
+  printf("$ ");
+  fget(command, sizeof(command), stdin);
 
   return 0;
 }
