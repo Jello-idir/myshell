@@ -50,7 +50,7 @@ int echo(int argc, char **argv)
 int type(int argc, char **argv)
 {
 
-    for (int idx = 0; argv[idx]; idx++) {
+    for (int idx = 0; builtin_s[idx]; idx++) {
         if (!strcmp(argv[1], builtin_s[idx])) {
             printf("%s is a shell builtin\n", argv[1]);
             return EXIT_SUCCESS;
