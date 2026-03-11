@@ -93,9 +93,7 @@ int repl() {
     int     argc;
 
     while (1) {
-        if(status)
-            printf("\033[31m*\033[0m");
-        printf("\033[32mxdd\033[0m@\033[34mshell\033[0m:$ ");
+        printf("$ ");
 
         // readingnc
         if (!fgets(cmdline, sizeof(cmdline), stdin))
