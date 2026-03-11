@@ -1,41 +1,115 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 
-void echo(char *input)
-{
-    printf("%s\n", input + 5);
-}
+typedef int (*func)(int, char **);
 
-int bridge(char *cmdline)
+int ft_exit(int, char**);
+int echo(int, char**);
+int type(int, char**);
+
+char *builtin_s[] = {
+    "exit",
+    "echo",
+    "type"
+};
+
+func builtin[] = {
+    ft_exit,
+    echo,
+    type,
+};
+
+
+int ft_exit(int argc, char **argv)
 {
-    if (!strcmp(cmdline, "exit"))
-        return 1;
-    if (!strncmp(cmdline, "echo ", 5))
-        echo(cmdline);
+    if (argc > 1)
+        exit(atoi(argv[1]));
     else
-        printf("%s: command not found\n", cmdline);
-    return 0;
+        exit(EXIT_SUCCESS);
+    return EXIT_SUCCESS;
 }
 
-void repl()
+int getcid(char *command)
 {
-    char cmdline[1024];
+    for (int idx = 0; builtin_s[idx]; idx++)
+        if (!strcmp(command, builtin_s[idx]))
+            return idx;
+    return -1;
+}
 
-    while(1)
-    {
-        printf("$ ");
+int echo(int argc, char **argv)
+{
+    for (int idx = 1; idx < argc; idx++) {
+        printf("%s ", argv[idx]);
+    }
+    printf("\n");
+    return EXIT_SUCCESS;
+}
+
+int type(int argc, char **argv)
+{
+
+    for (int idx = 0; argv[idx]; idx++) {
+        if (!strcmp(argv[1], builtin_s[idx])) {
+            printf("%s is a shell builtin\n", argv[1]);
+            return EXIT_SUCCESS;
+        }
+    }
+    printf("%s: not found\n", argv[1]);
+    return EXIT_FAILURE;
+}
+
+int bridge(int argc, char **argv)
+{
+    int id;
+
+    id = getcid(argv[0]);
+    if (id == -1) {
+        printf("%s: command not found\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+    builtin[id](argc, argv);
+    return EXIT_SUCCESS;
+}
+
+int evaluate( char *cmdline, char **argv) {
+    int argc;
+
+    cmdline[strcspn(cmdline, "\n")] = 0;
+    argc = 0;
+    argv[argc++]= strtok(cmdline, " ");
+    do {
+        argv[argc] = strtok(NULL, " ");
+        argc++;
+    } while (argv[argc - 1]);
+    return argc - 1;
+}
+
+int repl() {
+    char    cmdline[1024];
+    char    *argv[64];
+    int     status;
+    int     argc;
+
+    while (1) {
+        if(status)
+            printf("\033[31m*\033[0m");
+        printf("\033[32mxdd\033[0m@\033[34mshell\033[0m:$ ");
+
+        // readingnc
         if (!fgets(cmdline, sizeof(cmdline), stdin))
-            return;
-        cmdline[strcspn(cmdline, "\n")] = 0;
-        if (bridge(cmdline))
-            return ;
+            return EXIT_FAILURE;
+        // evaluating
+        argc = evaluate(cmdline, argv);
+
+        // executing
+        status = bridge(argc, argv);
+
     }
 }
 
 int main(int argc, char *argv[]) {
-
     setbuf(stdout, NULL);
-    repl();
-    return 0;
+    return repl();
 }
