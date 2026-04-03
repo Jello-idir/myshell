@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <dirent.h>
 
 typedef int (*func)(int, char **);
 
@@ -47,16 +48,43 @@ int echo(int argc, char **argv)
     return EXIT_SUCCESS;
 }
 
+char *findpath(char *bin)
+{
+    char            *path;
+    DIR             *dir;
+    struct  dirent  *entry;
+
+    path = getenv("PATH");
+    char *tmp = strtok(path, ":;");
+    while (tmp)
+    {
+        printf("%s\n", tmp);
+        tmp = strtok(NULL, ":;");
+    }
+    return NULL;
+}
+
 int type(int argc, char **argv)
 {
+    int     built;
+    int     arg;
+    char    *path;
 
-    for (int idx = 0; builtin_s[idx]; idx++) {
-        if (!strcmp(argv[1], builtin_s[idx])) {
-            printf("%s is a shell builtin\n", argv[1]);
-            return EXIT_SUCCESS;
+    for (arg = 1; arg < argc; arg++) {
+        for (built = 0; builtin_s[built]; built++) {
+            if (!strcmp(argv[arg], builtin_s[built])) {
+                printf("%s is a shell builtin\n", argv[arg]);
+                break;
+            }
+        }
+        if (!builtin_s[built]) {
+            path = findpath(argv[arg]);
+            if (path)
+                printf("%s is %s", argv[arg], path);
+            else
+                printf("%s: not found\n", argv[arg]);
         }
     }
-    printf("%s: not found\n", argv[1]);
     return EXIT_FAILURE;
 }
 
